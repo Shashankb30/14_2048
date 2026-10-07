@@ -105,3 +105,11 @@ class Board:
                 if r + 1 < SIZE and self.grid[r][c] == self.grid[r + 1][c]:
                     return True
         return False
+
+    def snapshot(self):
+        """Copy of everything needed to restore this board (grid + score)."""
+        return [row[:] for row in self.grid], self.score
+
+    def restore(self, snap):
+        self.grid = [row[:] for row in snap[0]]
+        self.score = snap[1]
