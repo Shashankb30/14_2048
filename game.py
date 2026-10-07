@@ -1,5 +1,7 @@
 from board import Board
 
+DIRECTIONS = {"a": "left", "d": "right", "w": "up", "s": "down"}
+
 
 class Game:
     def __init__(self):
@@ -15,24 +17,27 @@ class Game:
         print("Score:", self.board.score, " Best:", self.best_score)
 
     def move(self, key):
-        moves = {"a": self.board.move_left, "d": self.board.move_right,
-                 "w": self.board.move_up, "s": self.board.move_down}
-        if key not in moves:
+        """Apply a move. Returns True only if the board changed.
+
+        A new tile is added only after a successful (changing) move.
+        """
+        if key not in DIRECTIONS:
             return False
-        changed = moves[key]()
+        changed = getattr(self.board, f"move_{DIRECTIONS[key]}")()
         if changed:
             self.board.add_random_tile()
+            self.best_score = max(self.best_score, self.board.score)
         return changed
 
     def run(self):
         print("2048 — W/A/S/D to move, U to undo, Q to quit.")
         while True:
             self.display()
-            if any(2048 in row for row in self.board.grid):
-                print("You reached 2048!")
+            if self.board.has_won():
+                print("You reached 2048! You win!")
                 return
             if not self.board.can_move():
-                print("No legal moves remain.")
+                print("No legal moves remain. Game over.")
                 return
             key = input("> ").strip().lower()
             if key == "q":
@@ -40,8 +45,7 @@ class Game:
             if key == "u":
                 print("Undo is not implemented yet.")
                 continue
-            if key not in "wasd":
+            if key not in DIRECTIONS:   # exact match (the old substring test let "" and "wa" through)
                 print("Use W/A/S/D.")
                 continue
-            if self.move(key):
-                self.best_score = max(self.best_score, self.board.score)
+            self.move(key)

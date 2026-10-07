@@ -1,6 +1,7 @@
 import random
 
 SIZE = 4
+WIN_TILE = 2048
 
 
 class Board:
@@ -90,6 +91,9 @@ class Board:
 
     def move_down(self):
         return self._move("down")
+
+    def has_won(self):
+        return any(WIN_TILE in row for row in self.grid)
 
     def can_move(self):
         if any(0 in row for row in self.grid):
