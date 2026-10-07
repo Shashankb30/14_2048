@@ -43,6 +43,14 @@ class Game:
         self.undo_state = None
         return True
 
+    def feedback(self, key):
+        """One action-level message for one accepted move."""
+        name = DIRECTIONS[key].capitalize()
+        if self.board.last_merges:
+            plural = "s" if self.board.last_merges > 1 else ""
+            return f"Moved {name}: {self.board.last_merges} merge{plural}, +{self.board.last_gain} points."
+        return f"Moved {name}."
+
     def run(self):
         print("2048 — W/A/S/D to move, U to undo, Q to quit.")
         while True:
@@ -62,4 +70,7 @@ class Game:
             if key not in DIRECTIONS:   # exact match (the old substring test let "" and "wa" through)
                 print("Use W/A/S/D.")
                 continue
-            self.move(key)
+            if self.move(key):
+                print(self.feedback(key))
+            else:
+                print("Nothing moved - try another direction.")
